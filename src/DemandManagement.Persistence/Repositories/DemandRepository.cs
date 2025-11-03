@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -67,10 +68,8 @@ public sealed class DemandRepository : IDemandRepository
                 (d.Description != null && d.Description.ToLower().Contains(term)));
         }
 
-        // Contar total antes de paginar
         var totalCount = await query.CountAsync(cancellationToken);
 
-        // Aplicar paginación y ordenar por fecha de creación descendente
         var items = await query
             .OrderByDescending(d => d.Audit.CreatedDate)
             .Skip((pageNumber - 1) * pageSize)
@@ -78,6 +77,42 @@ public sealed class DemandRepository : IDemandRepository
             .ToListAsync(cancellationToken);
 
         return (items, totalCount);
+    }
+
+    public async Task<int> GetTotalCountAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.Demands.AsNoTracking().CountAsync(cancellationToken);
+    }
+
+    public async Task<int> GetCountByStatusNamesAsync(IEnumerable<string> statusNames, CancellationToken cancellationToken = default)
+    {
+        var statusIds = await _context.Statuses
+            .AsNoTracking()
+            .Where(s => statusNames.Contains(s.Name))
+            .Select(s => s.Id)
+            .ToListAsync(cancellationToken);
+
+        return await _context.Demands
+            .AsNoTracking()
+            .Where(d => statusIds.Contains(d.StatusId))
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<int> GetCountByPriorityAsync(PriorityLevel priority, CancellationToken cancellationToken = default)
+    {
+        return await _context.Demands
+            .AsNoTracking()
+            .Where(d => d.Priority.Level == priority)
+            .CountAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Demand>> GetRecentAsync(int count, CancellationToken cancellationToken = default)
+    {
+        return await _context.Demands
+            .AsNoTracking()
+            .OrderByDescending(d => d.Audit.CreatedDate)
+            .Take(count)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(Demand demand, CancellationToken cancellationToken = default)

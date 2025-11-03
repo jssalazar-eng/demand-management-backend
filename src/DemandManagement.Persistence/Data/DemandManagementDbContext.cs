@@ -24,7 +24,6 @@ public class DemandManagementDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Demand
         modelBuilder.Entity<Demand>(entity =>
         {
             entity.ToTable("Demands");
@@ -68,7 +67,6 @@ public class DemandManagementDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // DemandType
         modelBuilder.Entity<DemandType>(entity =>
         {
             entity.ToTable("DemandTypes");
@@ -81,7 +79,6 @@ public class DemandManagementDbContext : DbContext
             entity.Property(dt => dt.ServiceLevel).HasMaxLength(100);
         });
 
-        // Status
         modelBuilder.Entity<Status>(entity =>
         {
             entity.ToTable("Statuses");
@@ -95,7 +92,6 @@ public class DemandManagementDbContext : DbContext
             entity.Property(s => s.IsInitial).IsRequired();
         });
 
-        // User
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
@@ -120,7 +116,6 @@ public class DemandManagementDbContext : DbContext
             entity.Property(u => u.Department).HasMaxLength(100);
         });
 
-        // Role
         modelBuilder.Entity<Role>(entity =>
         {
             entity.ToTable("Roles");
@@ -132,7 +127,6 @@ public class DemandManagementDbContext : DbContext
             entity.Property(r => r.Description).HasMaxLength(500);
         });
 
-        // AssociatedDocument
         modelBuilder.Entity<AssociatedDocument>(entity =>
         {
             entity.ToTable("AssociatedDocuments");

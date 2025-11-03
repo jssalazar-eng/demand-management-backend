@@ -10,7 +10,6 @@ public sealed class User : BaseEntity<UserId>
     public RoleId RoleId { get; private set; }
     public string? Department { get; private set; }
 
-    // Constructor privado sin parámetros para EF Core
     private User() : base(default!)
     {
         FullName = default!;

@@ -21,7 +21,6 @@ public sealed class Demand : BaseEntity<DemandId>
     private readonly List<AssociatedDocument> _documents = new();
     public IReadOnlyCollection<AssociatedDocument> Documents => _documents.AsReadOnly();
 
-    // Constructor privado sin parámetros para EF Core
     private Demand() : base(default!)
     {
         Title = string.Empty;

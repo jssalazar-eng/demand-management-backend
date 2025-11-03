@@ -11,7 +11,6 @@ public sealed class AssociatedDocument : BaseEntity<DocumentId>
     public DateTimeOffset UploadDate { get; private set; }
     public UserId UploadedBy { get; private set; }
 
-    // Constructor privado sin parámetros para EF Core
     private AssociatedDocument() : base(default!)
     {
         DemandId = default!;

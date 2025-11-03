@@ -15,4 +15,8 @@
     <ProjectReference Include="..\DemandManagement.Domain\DemandManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>
