@@ -1,4 +1,4 @@
-
+using System;
 using DemandManagement.Domain.ValueObjects;
 
 namespace DemandManagement.Domain.Entities;
@@ -9,6 +9,11 @@ public sealed class Status : BaseEntity<StatusId>
     public int SequenceOrder { get; private set; }
     public bool IsFinal { get; private set; }
     public bool IsInitial { get; private set; }
+
+    private Status() : base(default!)
+    {
+        Name = string.Empty;
+    }
 
     public Status(StatusId id, string name, int sequenceOrder, bool isFinal, bool isInitial) : base(id)
     {

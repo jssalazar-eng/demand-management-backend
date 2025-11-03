@@ -9,6 +9,10 @@ public sealed record CorporateEmail
 
     public string Value { get; init; }
 
+    private CorporateEmail()
+    {
+    }
+
     private CorporateEmail(string email) => Value = email;
 
     public static CorporateEmail From(string email)

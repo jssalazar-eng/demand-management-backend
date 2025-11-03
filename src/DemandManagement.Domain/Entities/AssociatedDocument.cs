@@ -1,16 +1,25 @@
-using System;
 using DemandManagement.Domain.ValueObjects;
 
 namespace DemandManagement.Domain.Entities;
 
 public sealed class AssociatedDocument : BaseEntity<DocumentId>
 {
-    public DemandId DemandId { get; init; }
-    public string FileName { get; init; }
-    public string FileType { get; init; }
-    public string Path { get; init; }
-    public DateTimeOffset UploadDate { get; init; }
-    public UserId UploadedBy { get; init; }
+    public DemandId DemandId { get; private set; }
+    public string FileName { get; private set; }
+    public string FileType { get; private set; }
+    public string Path { get; private set; }
+    public DateTimeOffset UploadDate { get; private set; }
+    public UserId UploadedBy { get; private set; }
+
+    // Constructor privado sin parámetros para EF Core
+    private AssociatedDocument() : base(default!)
+    {
+        DemandId = default!;
+        FileName = string.Empty;
+        FileType = string.Empty;
+        Path = string.Empty;
+        UploadedBy = default!;
+    }
 
     public AssociatedDocument(DocumentId id,
                               DemandId demandId,

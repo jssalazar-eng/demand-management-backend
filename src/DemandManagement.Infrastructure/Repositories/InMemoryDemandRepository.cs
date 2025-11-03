@@ -38,6 +38,54 @@ public sealed class InMemoryDemandRepository : IDemandRepository
         return Task.FromResult(d);
     }
 
+    public Task<(IEnumerable<Demand> Items, int TotalCount)> GetPagedAsync(
+      DemandTypeId? demandTypeId,
+      StatusId? statusId,
+      PriorityLevel? priority,
+      string? searchTerm,
+      int pageNumber,
+      int pageSize,
+      CancellationToken cancellationToken = default)
+    {
+        var query = _store.Values.AsEnumerable();
+
+        // Aplicar filtros
+        if (demandTypeId is not null)
+        {
+            query = query.Where(d => d.DemandTypeId.Value == demandTypeId.Value.Value);
+        }
+
+        if (statusId is not null)
+        {
+            query = query.Where(d => d.StatusId.Value == statusId.Value.Value);
+        }
+
+        if (priority is not null)
+        {
+            query = query.Where(d => d.Priority.Level == priority.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var term = searchTerm.Trim().ToLower();
+            query = query.Where(d =>
+                d.Title.ToLower().Contains(term) ||
+                (d.Description != null && d.Description.ToLower().Contains(term)));
+        }
+
+        // Contar total antes de paginar
+        var totalCount = query.Count();
+
+        // Aplicar paginación y ordenar por fecha de creación descendente
+        var items = query
+            .OrderByDescending(d => d.Audit.CreatedDate)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return Task.FromResult<(IEnumerable<Demand> Items, int TotalCount)>((items, totalCount));
+    }
+
     public Task UpdateAsync(Demand demand, CancellationToken cancellationToken = default)
     {
         _store[demand.Id.Value] = demand;

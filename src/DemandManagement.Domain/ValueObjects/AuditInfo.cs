@@ -2,10 +2,14 @@ using System;
 
 namespace DemandManagement.Domain.ValueObjects;
 
-public sealed record AuditInfo
+public sealed class AuditInfo
 {
-    public DateTimeOffset CreatedDate { get; init; }
-    public DateTimeOffset UpdatedDate { get; init; }
+    public DateTimeOffset CreatedDate { get; private set; }
+    public DateTimeOffset UpdatedDate { get; private set; }
+
+    private AuditInfo()
+    {
+    }
 
     private AuditInfo(DateTimeOffset created, DateTimeOffset updated)
     {

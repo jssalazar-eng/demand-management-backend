@@ -8,6 +8,11 @@ public sealed class Role : BaseEntity<RoleId>
     public string Name { get; private set; }
     public string? Description { get; private set; }
 
+    private Role() : base(default!)
+    {
+        Name = string.Empty;
+    }
+
     public Role(RoleId id, string name, string? description) : base(id)
     {
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name required", nameof(name));

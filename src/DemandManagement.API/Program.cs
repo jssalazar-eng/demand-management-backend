@@ -1,21 +1,26 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MediatR;
-using DemandManagement.Infrastructure.Repositories;
+using DemandManagement.Persistence.Data;
+using DemandManagement.Persistence.Repositories;
 using DemandManagement.Domain.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Registrar controllers
-builder.Services.AddControllers();
+// Registrar DbContext con SQL Server
+builder.Services.AddDbContext<DemandManagementDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Registrar MediatR (apunta a la assembly de Application)
+// Registrar Unit of Work
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Registrar MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DemandManagement.Application.Requests.CreateDemandCommand).Assembly));
 
-// Registrar repositorio (InMemory demo)
-builder.Services.AddSingleton<IDemandRepository, InMemoryDemandRepository>();
-
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

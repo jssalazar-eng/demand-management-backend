@@ -14,8 +14,8 @@ namespace DemandManagement.Application.Handlers;
 
 public sealed class CreateDemandHandler : IRequestHandler<CreateDemandCommand, DemandDto>
 {
-    private readonly IDemandRepository _repo;
-    public CreateDemandHandler(IDemandRepository repo) => _repo = repo;
+    private readonly IUnitOfWork _uow;
+    public CreateDemandHandler(IUnitOfWork uow) => _uow = uow;
 
     public async Task<DemandDto> Handle(CreateDemandCommand request, CancellationToken cancellationToken)
     {
@@ -31,7 +31,8 @@ public sealed class CreateDemandHandler : IRequestHandler<CreateDemandCommand, D
             request.DueDate
         );
 
-        await _repo.AddAsync(demand, cancellationToken);
+        await _uow.Demands.AddAsync(demand, cancellationToken);
+        await _uow.SaveChangesAsync(cancellationToken);
 
         return Map(demand);
     }
@@ -54,18 +55,19 @@ public sealed class CreateDemandHandler : IRequestHandler<CreateDemandCommand, D
 
 public sealed class UpdateDemandHandler : IRequestHandler<UpdateDemandCommand, DemandDto>
 {
-    private readonly IDemandRepository _repo;
-    public UpdateDemandHandler(IDemandRepository repo) => _repo = repo;
+    private readonly IUnitOfWork _uow;
+    public UpdateDemandHandler(IUnitOfWork uow) => _uow = uow;
 
     public async Task<DemandDto> Handle(UpdateDemandCommand request, CancellationToken cancellationToken)
     {
         var id = DemandId.From(request.Id);
-        var existing = await _repo.GetByIdAsync(id, cancellationToken)
+        var existing = await _uow.Demands.GetByIdAsync(id, cancellationToken)
             ?? throw new InvalidOperationException("Demand not found.");
 
         existing.UpdateDetails(request.Title, request.Description, Priority.From(request.Priority), DemandTypeId.From(request.DemandTypeId));
 
-        await _repo.UpdateAsync(existing, cancellationToken);
+        await _uow.Demands.UpdateAsync(existing, cancellationToken);
+        await _uow.SaveChangesAsync(cancellationToken);
 
         return Map(existing);
     }
@@ -88,23 +90,24 @@ public sealed class UpdateDemandHandler : IRequestHandler<UpdateDemandCommand, D
 
 public sealed class DeleteDemandHandler : IRequestHandler<DeleteDemandCommand>
 {
-    private readonly IDemandRepository _repo;
-    public DeleteDemandHandler(IDemandRepository repo) => _repo = repo;
+    private readonly IUnitOfWork _uow;
+    public DeleteDemandHandler(IUnitOfWork uow) => _uow = uow;
 
     public async Task Handle(DeleteDemandCommand request, CancellationToken cancellationToken)
     {
-        await _repo.DeleteAsync(DemandId.From(request.Id), cancellationToken);
+        await _uow.Demands.DeleteAsync(DemandId.From(request.Id), cancellationToken);
+        await _uow.SaveChangesAsync(cancellationToken);
     }
 }
 
 public sealed class GetDemandByIdHandler : IRequestHandler<GetDemandByIdQuery, DemandDto?>
 {
-    private readonly IDemandRepository _repo;
-    public GetDemandByIdHandler(IDemandRepository repo) => _repo = repo;
+    private readonly IUnitOfWork _uow;
+    public GetDemandByIdHandler(IUnitOfWork uow) => _uow = uow;
 
     public async Task<DemandDto?> Handle(GetDemandByIdQuery request, CancellationToken cancellationToken)
     {
-        var d = await _repo.GetByIdAsync(DemandId.From(request.Id), cancellationToken);
+        var d = await _uow.Demands.GetByIdAsync(DemandId.From(request.Id), cancellationToken);
         if (d is null) return null;
 
         return new DemandDto(
@@ -126,12 +129,12 @@ public sealed class GetDemandByIdHandler : IRequestHandler<GetDemandByIdQuery, D
 
 public sealed class GetAllDemandsHandler : IRequestHandler<GetAllDemandsQuery, IEnumerable<DemandDto>>
 {
-    private readonly IDemandRepository _repo;
-    public GetAllDemandsHandler(IDemandRepository repo) => _repo = repo;
+    private readonly IUnitOfWork _uow;
+    public GetAllDemandsHandler(IUnitOfWork uow) => _uow = uow;
 
     public async Task<IEnumerable<DemandDto>> Handle(GetAllDemandsQuery request, CancellationToken cancellationToken)
     {
-        var list = await _repo.GetAllAsync(cancellationToken);
+        var list = await _uow.Demands.GetAllAsync(cancellationToken);
         return list.Select(d => new DemandDto(
             d.Id.Value,
             d.Title,
