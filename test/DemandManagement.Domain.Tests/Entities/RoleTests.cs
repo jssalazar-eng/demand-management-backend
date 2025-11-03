@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using FluentAssertions;
 using Xunit;
 using DemandManagement.Domain.Entities;
@@ -28,10 +28,10 @@ public class RoleTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData(null)]
-    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string name)
+    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string? name)
     {
         // Act & Assert
-        var act = () => Role.Create(name, "Description");
+        var act = () => Role.Create(name!, "Description");
         act.Should().Throw<ArgumentException>().WithMessage("*Name required*");
     }
 

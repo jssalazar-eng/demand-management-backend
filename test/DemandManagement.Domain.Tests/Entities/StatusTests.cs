@@ -32,10 +32,10 @@ public class StatusTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData(null)]
-    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string name)
+    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string? name)
     {
         // Act & Assert
-        var act = () => Status.Create(name, 1);
+        var act = () => Status.Create(name!, 1);
         act.Should().Throw<ArgumentException>().WithMessage("*Name required*");
     }
 

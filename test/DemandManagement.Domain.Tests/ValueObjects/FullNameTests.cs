@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using FluentAssertions;
 using Xunit;
 using DemandManagement.Domain.ValueObjects;
@@ -9,7 +9,7 @@ public class FullNameTests
 {
     [Theory]
     [InlineData("John Doe")]
-    [InlineData("María García")]
+    [InlineData("MarÃ­a GarcÃ­a")]
     [InlineData("  Trimmed Name  ")]
     public void From_ShouldCreateValidFullName_WhenNameIsValid(string name)
     {
@@ -24,10 +24,10 @@ public class FullNameTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void From_ShouldThrowArgumentException_WhenNameIsInvalid(string name)
+    public void From_ShouldThrowArgumentException_WhenNameIsInvalid(string? name)
     {
         // Act & Assert
-        var act = () => FullName.From(name);
+        var act = () => FullName.From(name!);
         act.Should().Throw<ArgumentException>().WithMessage("*FullName is required*");
     }
 }

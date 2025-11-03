@@ -24,10 +24,10 @@ public class CorporateEmailTests
     [InlineData("")]
     [InlineData("   ")]
     [InlineData(null)]
-    public void From_ShouldThrowArgumentException_WhenEmailIsEmpty(string email)
+    public void From_ShouldThrowArgumentException_WhenEmailIsEmpty(string? email)
     {
         // Act & Assert
-        var act = () => CorporateEmail.From(email);
+        var act = () => CorporateEmail.From(email!);
         act.Should().Throw<ArgumentException>();
     }
 

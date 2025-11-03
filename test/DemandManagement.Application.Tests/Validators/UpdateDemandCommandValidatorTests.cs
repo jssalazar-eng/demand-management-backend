@@ -59,12 +59,12 @@ public class UpdateDemandCommandValidatorTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData(null)]
-    public void Validate_ShouldFail_WhenTitleIsEmpty(string title)
+    public void Validate_ShouldFail_WhenTitleIsEmpty(string? title)
     {
         // Arrange
         var command = new UpdateDemandCommand(
             Guid.NewGuid(),
-            title,
+            title!,
             "Description",
             PriorityLevel.High,
             Guid.NewGuid()

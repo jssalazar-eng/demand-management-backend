@@ -7,7 +7,7 @@ public sealed record CorporateEmail
 {
     private static readonly Regex EmailRegex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public string Value { get; init; }
+    public string Value { get; init; } = string.Empty;
 
     private CorporateEmail()
     {

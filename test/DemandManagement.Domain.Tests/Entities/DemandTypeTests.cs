@@ -30,10 +30,10 @@ public class DemandTypeTests
     [InlineData("")]
     [InlineData("  ")]
     [InlineData(null)]
-    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string name)
+    public void Create_ShouldThrowArgumentException_WhenNameIsInvalid(string? name)
     {
         // Act & Assert
-        var act = () => DemandType.Create(name, "Description", "SLA");
+        var act = () => DemandType.Create(name!, "Description", "SLA");
         act.Should().Throw<ArgumentException>().WithMessage("*Name required*");
     }
 
