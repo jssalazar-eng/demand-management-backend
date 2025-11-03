@@ -7,11 +7,10 @@ namespace DemandManagement.Domain.Repositories;
 public interface IUnitOfWork : IDisposable
 {
     IDemandRepository Demands { get; }
-    // Agrega otros repositorios si los necesitas:
-    // IDemandTypeRepository DemandTypes { get; }
-    // IStatusRepository Statuses { get; }
-    // IUserRepository Users { get; }
-    // IRoleRepository Roles { get; }
-
+    IDemandTypeRepository DemandTypes { get; }
+    IStatusRepository Statuses { get; }
+    IRoleRepository Roles { get; }
+    IUserRepository Users { get; }
+    
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
