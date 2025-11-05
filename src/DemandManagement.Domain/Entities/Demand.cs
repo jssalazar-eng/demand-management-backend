@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using DemandManagement.Domain.ValueObjects;
@@ -70,10 +70,13 @@ public sealed class Demand : BaseEntity<DemandId>
         var audit = AuditInfo.CreateNow();
         var id = DemandId.New();
 
-        if (dueDate.HasValue && dueDate.Value < audit.CreatedDate)
+        // ✅ Si no se proporciona DueDate, calcularlo según prioridad
+        var calculatedDueDate = dueDate ?? priority.CalculateDueDate(audit.CreatedDate);
+
+        if (calculatedDueDate < audit.CreatedDate)
             throw new ArgumentException("DueDate cannot be before CreatedDate", nameof(dueDate));
 
-        return new Demand(id, title.Trim(), description?.Trim(), audit, priority, demandTypeId, statusId, requestingUserId, assignedToId, dueDate, null);
+        return new Demand(id, title.Trim(), description?.Trim(), audit, priority, demandTypeId, statusId, requestingUserId, assignedToId, calculatedDueDate, null);
     }
 
     public void UpdateDetails(string title, string? description, Priority priority, DemandTypeId demandTypeId)
@@ -81,16 +84,32 @@ public sealed class Demand : BaseEntity<DemandId>
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Title is required", nameof(title));
 
+        var oldPriority = Priority;
+        
         Title = title.Trim();
         Description = description?.Trim();
         Priority = priority;
         DemandTypeId = demandTypeId;
+        
+        // ✅ Si cambió la prioridad, recalcular DueDate automáticamente
+        if (oldPriority.Level != priority.Level)
+        {
+            DueDate = priority.CalculateDueDateFromNow();
+        }
+        
         Audit = Audit.WithUpdated(DateTimeOffset.UtcNow);
     }
 
     public void AssignTo(UserId assignee)
     {
         AssignedToId = assignee;
+        Audit = Audit.WithUpdated(DateTimeOffset.UtcNow);
+    }
+
+    // ✅ NUEVO: Método para desasignar
+    public void Unassign()
+    {
+        AssignedToId = null;
         Audit = Audit.WithUpdated(DateTimeOffset.UtcNow);
     }
 

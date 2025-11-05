@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediatR;
 using DemandManagement.Domain.Repositories;
 using DemandManagement.Domain.ValueObjects;
+using DemandManagement.Domain.Constants; // ✅ Agregar
 using DemandManagement.Application.DTOs;
 using DemandManagement.Application.Requests;
 
@@ -22,12 +23,13 @@ public sealed class GetDashboardDataHandler : IRequestHandler<GetDashboardDataQu
         // Execute queries sequentially to avoid DbContext concurrency issues
         var totalCount = await _uow.Demands.GetTotalCountAsync(cancellationToken);
         
+        // ✅ Usar constantes en lugar de strings
         var inProgressCount = await _uow.Demands.GetCountByStatusNamesAsync(
-            new[] { "En An�lisis", "En Desarrollo", "En Pruebas" }, 
+            StatusNames.InProgressStatuses, 
             cancellationToken);
         
         var completedCount = await _uow.Demands.GetCountByStatusNamesAsync(
-            new[] { "Cerrada" }, 
+            StatusNames.CompletedStatuses, 
             cancellationToken);
         
         var criticalCount = await _uow.Demands.GetCountByPriorityAsync(

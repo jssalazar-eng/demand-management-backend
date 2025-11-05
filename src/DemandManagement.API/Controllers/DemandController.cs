@@ -57,10 +57,14 @@ public class DemandController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Actualizar demanda
+    /// Permite cambiar: título, descripción, prioridad (recalcula DueDate), tipo, y asignación
+    /// </summary>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<DemandDto>> Update(Guid id, UpdateDemandCommand cmd)
     {
-        if (id != cmd.Id) return BadRequest();
+        if (id != cmd.Id) return BadRequest("El ID de la ruta no coincide con el ID del comando");
         var updated = await _mediator.Send(cmd);
         return Ok(updated);
     }

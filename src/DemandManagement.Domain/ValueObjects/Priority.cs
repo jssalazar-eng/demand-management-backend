@@ -33,5 +33,29 @@ public sealed record Priority
         };
     }
 
+    /// <summary>
+    /// Calcula la fecha límite basada en la prioridad
+    /// Critical: +1 día, High: +2 días, Medium: +3 días, Low: +4 días
+    /// </summary>
+    public DateTimeOffset CalculateDueDate(DateTimeOffset fromDate)
+    {
+        var daysToAdd = Level switch
+        {
+            PriorityLevel.Critical => 1,
+            PriorityLevel.High => 2,
+            PriorityLevel.Medium => 3,
+            PriorityLevel.Low => 4,
+            _ => 3 // Default a Medium si es un valor desconocido
+        };
+
+        return fromDate.AddDays(daysToAdd);
+    }
+
+    /// <summary>
+    /// Calcula la fecha límite desde ahora
+    /// </summary>
+    public DateTimeOffset CalculateDueDateFromNow()
+        => CalculateDueDate(DateTimeOffset.UtcNow);
+
     public override string ToString() => Level.ToString();
 }

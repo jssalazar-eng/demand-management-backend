@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using DemandManagement.Application.DTOs;
@@ -20,6 +20,7 @@ public sealed class CreateDemandHandler : IRequestHandler<CreateDemandCommand, D
     public async Task<DemandDto> Handle(CreateDemandCommand request, CancellationToken cancellationToken)
     {
         var priority = Priority.From(request.Priority);
+        
         var demand = Demand.Create(
             request.Title,
             request.Description,
@@ -49,7 +50,33 @@ public sealed class UpdateDemandHandler : IRequestHandler<UpdateDemandCommand, D
         var existing = await _uow.Demands.GetByIdAsync(id, cancellationToken)
             ?? throw new NotFoundException(nameof(Demand), request.Id);
 
-        existing.UpdateDetails(request.Title, request.Description, Priority.From(request.Priority), DemandTypeId.From(request.DemandTypeId));
+        existing.UpdateDetails(
+            request.Title, 
+            request.Description, 
+            Priority.From(request.Priority), 
+            DemandTypeId.From(request.DemandTypeId)
+        );
+
+        // ✅ Actualizar asignación solo si es diferente al actual
+        if (request.AssignedToId.HasValue)
+        {
+            var newAssignee = UserId.From(request.AssignedToId.Value);
+            
+            // ✅ VALIDACIÓN: Solo actualizar si realmente cambió
+            if (existing.AssignedToId?.Value != newAssignee.Value)
+            {
+                existing.AssignTo(newAssignee);
+            }
+            // Si es el mismo usuario, no hace nada (evita actualización innecesaria)
+        }
+        else
+        {
+            // Si se envía null, desasignar solo si había alguien asignado
+            if (existing.AssignedToId != null)
+            {
+                existing.Unassign();
+            }
+        }
 
         await _uow.Demands.UpdateAsync(existing, cancellationToken);
         await _uow.SaveChangesAsync(cancellationToken);

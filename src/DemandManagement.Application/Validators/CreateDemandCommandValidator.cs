@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using DemandManagement.Application.Requests;
+using DemandManagement.Domain.Constants;
 
 namespace DemandManagement.Application.Validators;
 
@@ -12,12 +13,15 @@ public sealed class CreateDemandCommandValidator : AbstractValidator<CreateDeman
             .DependentRules(() =>
             {
                 RuleFor(x => x.Title)
-                    .MinimumLength(3).WithMessage("El título debe tener al menos 3 caracteres")
-                    .MaximumLength(200).WithMessage("El título no puede exceder 200 caracteres");
+                    .MinimumLength(ValidationConstants.Demand.TitleMinLength)
+                    .WithMessage($"El título debe tener al menos {ValidationConstants.Demand.TitleMinLength} caracteres")
+                    .MaximumLength(ValidationConstants.Demand.TitleMaxLength)
+                    .WithMessage($"El título no puede exceder {ValidationConstants.Demand.TitleMaxLength} caracteres");
             });
 
         RuleFor(x => x.Description)
-            .MaximumLength(2000).WithMessage("La descripción no puede exceder 2000 caracteres")
+            .MaximumLength(ValidationConstants.Demand.DescriptionMaxLength)
+            .WithMessage($"La descripción no puede exceder {ValidationConstants.Demand.DescriptionMaxLength} caracteres")
             .When(x => !string.IsNullOrWhiteSpace(x.Description));
 
         RuleFor(x => x.Priority)

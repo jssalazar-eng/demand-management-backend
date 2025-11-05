@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DemandManagement.Domain.Entities;
 using DemandManagement.Domain.ValueObjects;
+using DemandManagement.Domain.Constants;
 
 namespace DemandManagement.Persistence.Data;
 
@@ -34,8 +35,12 @@ public class DemandManagementDbContext : DbContext
                     value => DemandId.From(value))
                 .ValueGeneratedNever();
 
-            entity.Property(d => d.Title).IsRequired().HasMaxLength(200);
-            entity.Property(d => d.Description).HasMaxLength(2000);
+            entity.Property(d => d.Title)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Demand.TitleMaxLength); // ✅
+
+            entity.Property(d => d.Description)
+                .HasMaxLength(ValidationConstants.Demand.DescriptionMaxLength); // ✅
 
             entity.Property(d => d.DemandTypeId)
                 .HasConversion(id => id.Value, value => DemandTypeId.From(value));
@@ -74,9 +79,16 @@ public class DemandManagementDbContext : DbContext
             entity.Property(dt => dt.Id)
                 .HasConversion(id => id.Value, value => DemandTypeId.From(value))
                 .ValueGeneratedNever();
-            entity.Property(dt => dt.Name).IsRequired().HasMaxLength(100);
-            entity.Property(dt => dt.Description).HasMaxLength(500);
-            entity.Property(dt => dt.ServiceLevel).HasMaxLength(100);
+            
+            entity.Property(dt => dt.Name)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Catalog.NameMaxLength); // ✅
+            
+            entity.Property(dt => dt.Description)
+                .HasMaxLength(ValidationConstants.Catalog.DescriptionMaxLength); // ✅
+            
+            entity.Property(dt => dt.ServiceLevel)
+                .HasMaxLength(ValidationConstants.Catalog.ServiceLevelMaxLength); // ✅
         });
 
         modelBuilder.Entity<Status>(entity =>
@@ -86,7 +98,11 @@ public class DemandManagementDbContext : DbContext
             entity.Property(s => s.Id)
                 .HasConversion(id => id.Value, value => StatusId.From(value))
                 .ValueGeneratedNever();
-            entity.Property(s => s.Name).IsRequired().HasMaxLength(100);
+            
+            entity.Property(s => s.Name)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Catalog.NameMaxLength); // ✅
+            
             entity.Property(s => s.SequenceOrder).IsRequired();
             entity.Property(s => s.IsFinal).IsRequired();
             entity.Property(s => s.IsInitial).IsRequired();
@@ -102,18 +118,25 @@ public class DemandManagementDbContext : DbContext
 
             entity.OwnsOne(u => u.FullName, fn =>
             {
-                fn.Property(f => f.Value).HasColumnName("FullName").IsRequired().HasMaxLength(200);
+                fn.Property(f => f.Value)
+                    .HasColumnName("FullName")
+                    .IsRequired()
+                    .HasMaxLength(ValidationConstants.User.FullNameMaxLength); // ✅
             });
 
             entity.OwnsOne(u => u.CorporateEmail, ce =>
             {
-                ce.Property(c => c.Value).HasColumnName("CorporateEmail").IsRequired().HasMaxLength(200);
+                ce.Property(c => c.Value)
+                    .HasColumnName("CorporateEmail")
+                    .IsRequired()
+                    .HasMaxLength(ValidationConstants.User.EmailMaxLength); // ✅
             });
 
             entity.Property(u => u.RoleId)
                 .HasConversion(id => id.Value, value => RoleId.From(value));
 
-            entity.Property(u => u.Department).HasMaxLength(100);
+            entity.Property(u => u.Department)
+                .HasMaxLength(ValidationConstants.User.DepartmentMaxLength); // ✅
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -123,8 +146,13 @@ public class DemandManagementDbContext : DbContext
             entity.Property(r => r.Id)
                 .HasConversion(id => id.Value, value => RoleId.From(value))
                 .ValueGeneratedNever();
-            entity.Property(r => r.Name).IsRequired().HasMaxLength(100);
-            entity.Property(r => r.Description).HasMaxLength(500);
+            
+            entity.Property(r => r.Name)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Catalog.NameMaxLength); // ✅
+            
+            entity.Property(r => r.Description)
+                .HasMaxLength(ValidationConstants.Catalog.DescriptionMaxLength); // ✅
         });
 
         modelBuilder.Entity<AssociatedDocument>(entity =>
@@ -138,9 +166,18 @@ public class DemandManagementDbContext : DbContext
             entity.Property(ad => ad.DemandId)
                 .HasConversion(id => id.Value, value => DemandId.From(value));
 
-            entity.Property(ad => ad.FileName).IsRequired().HasMaxLength(255);
-            entity.Property(ad => ad.FileType).IsRequired().HasMaxLength(50);
-            entity.Property(ad => ad.Path).IsRequired().HasMaxLength(500);
+            entity.Property(ad => ad.FileName)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Document.FileNameMaxLength); // ✅
+            
+            entity.Property(ad => ad.FileType)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Document.FileTypeMaxLength); // ✅
+            
+            entity.Property(ad => ad.Path)
+                .IsRequired()
+                .HasMaxLength(ValidationConstants.Document.PathMaxLength); // ✅
+            
             entity.Property(ad => ad.UploadDate).IsRequired();
 
             entity.Property(ad => ad.UploadedBy)

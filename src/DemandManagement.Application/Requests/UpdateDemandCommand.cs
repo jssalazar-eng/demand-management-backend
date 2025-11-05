@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using MediatR;
 using DemandManagement.Domain.ValueObjects;
 
@@ -9,5 +9,6 @@ public sealed record UpdateDemandCommand(
     string Title,
     string? Description,
     PriorityLevel Priority,
-    Guid DemandTypeId
+    Guid DemandTypeId,
+    Guid? AssignedToId  // ✅ NUEVO: Permite cambiar asignación
 ) : IRequest<DemandManagement.Application.DTOs.DemandDto>;
